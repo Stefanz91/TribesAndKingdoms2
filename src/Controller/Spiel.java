@@ -1,15 +1,13 @@
 package Controller;
 
 import Model.Bauplatz;
+import Model.Gebäude;
 import Model.Mensch;
 import View.Arbeitsmenü;
 import View.Arbeitszuweisungsmenü;
-import View.Baumenü;
 import View.Hauptbildschirm;
 
-import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -23,24 +21,32 @@ public class Spiel {
 
     private ArrayList<Mensch> Menschen;
     private Bauplatz[] bauplätze = new Bauplatz[9];
+    private Bauplatz ausgewählterBauplatz;
+    private ArrayList<Gebäude> verfügbareGebäudeArten;
+    private Gebäude ausgewähltesGebäude;
     private Random random = new Random();
-    private Baumenü bau;
+
 
     public Spiel() {
         this.bevölkerung = 0;
         this.nahrung = 0;
         this.felle = 0;
         this.kleidung = 0;
+        ausgewählterBauplatz = null;
+        ausgewähltesGebäude = null;
 
         namen = new ArrayList<>();
         for (int i = 0; i<9;i++){
             bauplätze[i] = new Bauplatz();
         }
 
-        bildschirm = new Hauptbildschirm();
+        bildschirm = new Hauptbildschirm(bauplätze);
         bildschirm.setBtnArbeitsmenüActionListener(this::performArbeitsmenü);
         bildschirm.setBtnNächsteRunde(this::performNächsteRunde);
-        bildschirm.setBtnBaumenüActionListener(this::performBaumenü);
+        bildschirm.setBtnBaumenüActionListener(this::performGebäudeBauen);
+        for (int i = 0; i < bauplätze.length;i++){
+            bildschirm.setBauplatzActionListener(this::performGebäudeBauen,i);
+        }
         Menschen = new ArrayList<>();
         Mensch Adam = new Mensch("Adam",10, 9, 1, 1, 1);
         Menschen.add(Adam);
@@ -53,6 +59,8 @@ public class Spiel {
         bevölkerung = Menschen.size();
         namesArrayFüllen();
     }
+
+
 
     private void namesArrayFüllen(){
         namen.add("Abel");
@@ -130,17 +138,16 @@ public class Spiel {
         arbeiterZeigen("sammeln");
     }
 
-    private void performBaumenü(ActionEvent actionEvent){
-        bau = new Baumenü(bauplätze);
 
-        for (int i = 0; i < bauplätze.length;i++){
-          bau.setBauplatzActionListener(this::performGebäudeBauen,i);
-        }
-
-    }
 
     private void performGebäudeBauen(ActionEvent actionEvent) {
-       bau.makeVisible();
+        System.out.println(actionEvent.getActionCommand());
+        //System.out.println(actionEvent.getSource().getClass().getName().);
+       bildschirm.makeVisible();
+       if (actionEvent.getActionCommand().equals("Bauaufträge"))
+           return;
+       int id = Integer.valueOf(actionEvent.getActionCommand());
+        System.out.println(id);
     }
 
     private void arbeiterZeigen(String beruf){

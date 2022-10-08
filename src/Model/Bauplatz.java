@@ -37,4 +37,8 @@ public class Bauplatz extends JButton {
         this.gebäude = gebäude;
 
     }
+
+    public void changeColour(){
+        this.setBackground(Color.yellow);
+    }
 }
