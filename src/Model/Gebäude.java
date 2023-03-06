@@ -7,7 +7,7 @@ public class Gebäude {
     private double bauzeit;
     private boolean isBuildt;
 
-    public Gebäude(String typ, int baufortschritt, double bauzeit, boolean isBuildt) {
+    public Gebäude(String typ, double bauzeit) {
         this.typ = typ;
         this.baufortschritt = 0;
         this.bauzeit = bauzeit;

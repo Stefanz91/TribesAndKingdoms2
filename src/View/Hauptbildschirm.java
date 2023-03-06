@@ -18,6 +18,10 @@ public class Hauptbildschirm extends JFrame {
     private JPanel plGrid;
     private Bauplatz[] bauplätze;
     private JPanel gebäudeauswahl;
+    private JButton gebäude1;
+    private JButton gebäude2;
+    private JButton gebäude3;
+    private JButton gebäude4;
 
     public void setBevölkerung(int bevölkerung) {
         this.bevölkerung.setText("Bevölkerung: "+bevölkerung);
@@ -108,10 +112,10 @@ public class Hauptbildschirm extends JFrame {
         gridLayout.setVgap(10);
 
         gebäudeauswahl.setLayout(gridLayout);
-        JButton gebäude1 = new JButton("Gebäude 1");
-        JButton gebäude2 = new JButton("Gebäude 2");
-        JButton gebäude3 = new JButton("Gebäude 3");
-        JButton gebäude4 = new JButton("Gebäude 4");
+        gebäude1 = new JButton("Gebäude 1");
+        gebäude2 = new JButton("Gebäude 2");
+        gebäude3 = new JButton("Gebäude 3");
+        gebäude4 = new JButton("Gebäude 4");
         gebäudeauswahl.add(gebäude1);
         gebäudeauswahl.add(gebäude2);
         gebäudeauswahl.add(gebäude3);
@@ -120,13 +124,17 @@ public class Hauptbildschirm extends JFrame {
 
         this.add(plGrid,BorderLayout.CENTER);
 
-
-
-
     }
 
     public void setBauplatzActionListener(ActionListener listener, int index){
         bauplätze[index].addActionListener(listener);
+    }
+
+    public void setGebäudetypActionListener(ActionListener listener){
+        gebäude1.addActionListener(listener);
+        gebäude2.addActionListener(listener);
+        gebäude3.addActionListener(listener);
+        gebäude4.addActionListener(listener);
     }
 
     public void makeVisible(){

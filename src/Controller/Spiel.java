@@ -7,11 +7,13 @@ import View.Arbeitsmenü;
 import View.Arbeitszuweisungsmenü;
 import View.Hauptbildschirm;
 
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 import java.util.Random;
 
 public class Spiel {
+
     private int bevölkerung;
     private int nahrung;
     private int felle;
@@ -40,10 +42,14 @@ public class Spiel {
             bauplätze[i] = new Bauplatz();
         }
 
+        gebäudeartenDefinieren();
+        System.out.println(verfügbareGebäudeArten.size());
+
         bildschirm = new Hauptbildschirm(bauplätze);
         bildschirm.setBtnArbeitsmenüActionListener(this::performArbeitsmenü);
         bildschirm.setBtnNächsteRunde(this::performNächsteRunde);
         bildschirm.setBtnBaumenüActionListener(this::performGebäudeBauen);
+        bildschirm.setGebäudetypActionListener(this::performGebäudetypZuweisen);
         for (int i = 0; i < bauplätze.length;i++){
             bildschirm.setBauplatzActionListener(this::performGebäudeBauen,i);
         }
@@ -55,11 +61,25 @@ public class Spiel {
         Menschen.add(Eva);
         Eva.setArbeit("jagen");
         Menschen.add(new Mensch("Kain",5,2,3,7,5));
+        System.out.println("Menschen"+ Menschen.size());
 
         bevölkerung = Menschen.size();
         namesArrayFüllen();
     }
 
+    private void gebäudeartenDefinieren(){
+        verfügbareGebäudeArten = new ArrayList<>();
+        Gebäude zelt = new Gebäude("Zelt",100.0);
+        verfügbareGebäudeArten.add(zelt);
+        Gebäude großesZelt = new Gebäude("Zelt",150.0);
+        verfügbareGebäudeArten.add(großesZelt);
+        Gebäude holzHütte = new Gebäude("Hütte",250.0);
+        verfügbareGebäudeArten.add(holzHütte);
+        Gebäude lehmHütte = new Gebäude("Hütte",300.0);
+        verfügbareGebäudeArten.add(lehmHütte);
+        System.out.println(verfügbareGebäudeArten.size());
+
+    }
 
 
     private void namesArrayFüllen(){
@@ -115,7 +135,6 @@ public class Spiel {
 
     private void performArbeitsmenü(ActionEvent actionEvent) {
         Arbeitsmenü arbeitsmenü = new Arbeitsmenü();
-
         arbeitsmenü.setSammelnActionListener(this::performSammlerZeigen);
         arbeitsmenü.setJagenActionListener(this::performJägerZeigen);
         arbeitsmenü.setBauenActionListener(this::performBauarbeiterZeigen);
@@ -141,13 +160,56 @@ public class Spiel {
 
 
     private void performGebäudeBauen(ActionEvent actionEvent) {
-        System.out.println(actionEvent.getActionCommand());
-        //System.out.println(actionEvent.getSource().getClass().getName().);
+
        bildschirm.makeVisible();
        if (actionEvent.getActionCommand().equals("Bauaufträge"))
            return;
        int id = Integer.valueOf(actionEvent.getActionCommand());
-        System.out.println(id);
+        ausgewählterBauplatz = bauplätze[id-1];
+        System.out.println("Bauplatz"+ausgewählterBauplatz.getNummer());
+        if (ausgewähltesGebäude != null){
+            System.out.println("Gebäude wird gebaut!");
+        }
+    }
+
+    private void performGebäudetypZuweisen(ActionEvent actionEvent) {
+        //System.out.println(actionEvent.getActionCommand());
+        String gebäude = actionEvent.getActionCommand();
+        switch (gebäude){
+            case "Gebäude 1":
+                System.out.println("1");
+                ausgewähltesGebäude = verfügbareGebäudeArten.get(0);
+                break;
+            case "Gebäude 2":
+                System.out.println("2");
+                ausgewähltesGebäude = verfügbareGebäudeArten.get(1);
+                break;
+            case "Gebäude 3":
+                System.out.println("3");
+                ausgewähltesGebäude = verfügbareGebäudeArten.get(2);
+                break;
+            case "Gebäude 4":
+                System.out.println("4");
+                ausgewähltesGebäude = verfügbareGebäudeArten.get(3);
+                break;
+            default:
+                System.out.println("None");
+        }
+        if (ausgewählterBauplatz != null){
+            System.out.println("Gebäude " + ausgewähltesGebäude.getTyp()+" wird jetzt gebaut");
+            if (ausgewähltesGebäude.getTyp().equalsIgnoreCase("Zelt")){
+                ausgewählterBauplatz.setBackground(Color.yellow);
+            }else {
+                ausgewählterBauplatz.setBackground(Color.BLACK);
+            }
+
+        }
+        /*
+        if (actionEvent.getActionCommand().equalsIgnoreCase("Gebäude 1")){
+            System.out.println("1");
+        }
+        */
+
     }
 
     private void arbeiterZeigen(String beruf){
