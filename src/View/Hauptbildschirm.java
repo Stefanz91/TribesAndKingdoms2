@@ -8,6 +8,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 public class Hauptbildschirm extends JFrame {
+
     private JLabel bevölkerung;
     private JLabel nahrung;
     private JLabel felle;
@@ -18,10 +19,14 @@ public class Hauptbildschirm extends JFrame {
     private JPanel plGrid;
     private Bauplatz[] bauplätze;
     private JPanel gebäudeauswahl;
+
+    private JButton keinGebäude;
     private JButton gebäude1;
     private JButton gebäude2;
     private JButton gebäude3;
     private JButton gebäude4;
+    private JLabel wohnraum;
+    private JButton ausbildungsmenü;
 
     public void setBevölkerung(int bevölkerung) {
         this.bevölkerung.setText("Bevölkerung: "+bevölkerung);
@@ -38,6 +43,8 @@ public class Hauptbildschirm extends JFrame {
     public void setKleidung(int kleidung) {
         this.kleidung.setText("Kleidung: "+kleidung);
     }
+
+    public void setWohnraum(int wohnraum){this.wohnraum.setText("Wohnraum: "+wohnraum);}
 
     public Hauptbildschirm(Bauplatz[] bauplätze){
         this.bauplätze = bauplätze;
@@ -62,6 +69,8 @@ public class Hauptbildschirm extends JFrame {
         ressourchenleiste.add(felle);
         kleidung = new JLabel("Kleidung: ");
         ressourchenleiste.add(kleidung);
+        wohnraum = new JLabel("Wohnraum: ");
+        ressourchenleiste.add(wohnraum);
         this.add(ressourchenleiste, BorderLayout.NORTH);
 
         Dimension preferredSizeOfButtons = new Dimension( 300, 50);
@@ -72,10 +81,15 @@ public class Hauptbildschirm extends JFrame {
 
         arbeitsmenü = new JButton("Arbeit zuweisen");
         arbeitsmenü.setPreferredSize(preferredSizeOfButtons);
+
+        ausbildungsmenü = new JButton("Ausbildung zuweisen");
+        ausbildungsmenü.setPreferredSize(preferredSizeOfButtons);
+
         baumenü = new JButton("Bauaufträge");
         baumenü.setPreferredSize(preferredSizeOfButtons);
 
         auswahlpunkte.add(arbeitsmenü);
+        auswahlpunkte.add(ausbildungsmenü);
         auswahlpunkte.add(baumenü);
 
 
@@ -104,18 +118,20 @@ public class Hauptbildschirm extends JFrame {
 
         for (int i = 0; i<9;i++){
             plGrid.add(bauplätze[i]);
-            bauplätze[i].setBackground(new Color(53,104,45));
+            bauplätze[i].setBackground(bauplätze[i].getStartFarbe());
         }
 
         gebäudeauswahl = new JPanel();
-        GridLayout gridLayout = new GridLayout(4,1);
+        GridLayout gridLayout = new GridLayout(5,1);
         gridLayout.setVgap(10);
 
         gebäudeauswahl.setLayout(gridLayout);
+        keinGebäude = new JButton("kein Gebäude");
         gebäude1 = new JButton("Gebäude 1");
         gebäude2 = new JButton("Gebäude 2");
         gebäude3 = new JButton("Gebäude 3");
         gebäude4 = new JButton("Gebäude 4");
+        gebäudeauswahl.add(keinGebäude);
         gebäudeauswahl.add(gebäude1);
         gebäudeauswahl.add(gebäude2);
         gebäudeauswahl.add(gebäude3);
@@ -131,6 +147,7 @@ public class Hauptbildschirm extends JFrame {
     }
 
     public void setGebäudetypActionListener(ActionListener listener){
+        keinGebäude.addActionListener(listener);
         gebäude1.addActionListener(listener);
         gebäude2.addActionListener(listener);
         gebäude3.addActionListener(listener);
@@ -140,6 +157,7 @@ public class Hauptbildschirm extends JFrame {
     public void makeVisible(){
         gebäudeauswahl.setVisible(true);
     }
+    public void setBtnAusbildungsmenüActionListener(ActionListener listener){ausbildungsmenü.addActionListener(listener);}
     public void setBtnArbeitsmenüActionListener(ActionListener listener){arbeitsmenü.addActionListener(listener);}
     public void setBtnNächsteRunde(ActionListener listener){nächsteRunde.addActionListener(listener);}
     public void setBtnBaumenüActionListener(ActionListener listener){baumenü.addActionListener(listener);}

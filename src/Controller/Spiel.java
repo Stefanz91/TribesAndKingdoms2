@@ -5,9 +5,9 @@ import Model.Gebäude;
 import Model.Mensch;
 import View.Arbeitsmenü;
 import View.Arbeitszuweisungsmenü;
+import View.Ausbildungszuweisungsmenü;
 import View.Hauptbildschirm;
 
-import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 import java.util.Random;
@@ -18,12 +18,14 @@ public class Spiel {
     private int nahrung;
     private int felle;
     private int kleidung;
+    private  int wohnraum;
     private Hauptbildschirm bildschirm;
     private ArrayList<String> namen;
 
     private ArrayList<Mensch> Menschen;
     private Bauplatz[] bauplätze = new Bauplatz[9];
     private Bauplatz ausgewählterBauplatz;
+    private int aktiverBauplatz = -1;
     private ArrayList<Gebäude> verfügbareGebäudeArten;
     private Gebäude ausgewähltesGebäude;
     private Random random = new Random();
@@ -34,6 +36,7 @@ public class Spiel {
         this.nahrung = 0;
         this.felle = 0;
         this.kleidung = 0;
+        this.wohnraum = 0;
         ausgewählterBauplatz = null;
         ausgewähltesGebäude = null;
 
@@ -47,6 +50,7 @@ public class Spiel {
 
         bildschirm = new Hauptbildschirm(bauplätze);
         bildschirm.setBtnArbeitsmenüActionListener(this::performArbeitsmenü);
+        bildschirm.setBtnAusbildungsmenüActionListener(this::performAusbildungsmenü);
         bildschirm.setBtnNächsteRunde(this::performNächsteRunde);
         bildschirm.setBtnBaumenüActionListener(this::performGebäudeBauen);
         bildschirm.setGebäudetypActionListener(this::performGebäudetypZuweisen);
@@ -67,15 +71,17 @@ public class Spiel {
         namesArrayFüllen();
     }
 
+
+
     private void gebäudeartenDefinieren(){
         verfügbareGebäudeArten = new ArrayList<>();
-        Gebäude zelt = new Gebäude("Zelt",100.0);
+        Gebäude zelt = new Gebäude("Zelt",10.0,2);
         verfügbareGebäudeArten.add(zelt);
-        Gebäude großesZelt = new Gebäude("Zelt",150.0);
+        Gebäude großesZelt = new Gebäude("Zelt",15.0,4);
         verfügbareGebäudeArten.add(großesZelt);
-        Gebäude holzHütte = new Gebäude("Hütte",250.0);
+        Gebäude holzHütte = new Gebäude("Hütte",25.0,6);
         verfügbareGebäudeArten.add(holzHütte);
-        Gebäude lehmHütte = new Gebäude("Hütte",300.0);
+        Gebäude lehmHütte = new Gebäude("Hütte",30.0,8);
         verfügbareGebäudeArten.add(lehmHütte);
         System.out.println(verfügbareGebäudeArten.size());
 
@@ -110,7 +116,18 @@ public class Spiel {
                     felle = 0;
                 }
             }
-
+            if(mensch.getArbeit().equalsIgnoreCase("bauen")){
+                if (aktiverBauplatz>-1){
+                    bauplätze[aktiverBauplatz].getGebäude().setBaufortschritt(arbeit);
+                    System.out.println(bauplätze[aktiverBauplatz].getGebäude().isBuildt());
+                    if (bauplätze[aktiverBauplatz].getGebäude().isBuildt()){
+                        bauplätze[aktiverBauplatz].setBackground(bauplätze[aktiverBauplatz].getGebäude().getFarbe());
+                        wohnraum += bauplätze[aktiverBauplatz].getGebäude().getWohnraum();
+                        aktiverBauplatz = -1;
+                    }
+                }
+            }
+            ausbilden();
         }
         int randomNumber;
         if (nahrung > bevölkerung){
@@ -124,6 +141,16 @@ public class Spiel {
         bevölkerung = Menschen.size();
         altern();
         zeigeDaten();
+        ausgewähltesGebäude = null;
+        ausgewählterBauplatz = null;
+    }
+
+    private void ausbilden(){
+        for (int i = 0; i<Menschen.size(); i++){
+            if (Menschen.get(i).getWirdAusgebildetVon() != null){
+                Menschen.get(i).ausbildenLassen();
+            }
+        }
     }
 
     private void altern(){
@@ -133,6 +160,18 @@ public class Spiel {
         }
     }
 
+    private void performAusbildungsmenü(ActionEvent actionEvent) {
+        kinderZeigen();
+    }
+
+    private void kinderZeigen(){
+        Ausbildungszuweisungsmenü ausbildungszuweisung = new Ausbildungszuweisungsmenü(zähleKinder(),erwachsene());
+        for (int i = 0; i < Menschen.size(); i++){
+            if (Menschen.get(i).getAlter()<5){
+                ausbildungszuweisung.ausbilden(Menschen.get(i),erwachsene());
+            }
+        }
+    }
     private void performArbeitsmenü(ActionEvent actionEvent) {
         Arbeitsmenü arbeitsmenü = new Arbeitsmenü();
         arbeitsmenü.setSammelnActionListener(this::performSammlerZeigen);
@@ -165,6 +204,12 @@ public class Spiel {
        if (actionEvent.getActionCommand().equals("Bauaufträge"))
            return;
        int id = Integer.valueOf(actionEvent.getActionCommand());
+       if (ausgewählterBauplatz != null){
+           if (ausgewählterBauplatz.getGebäude() != null || !ausgewählterBauplatz.getGebäude().isBuildt()){
+               ausgewählterBauplatz.setGebäude(null);
+               ausgewählterBauplatz.setBackground(ausgewählterBauplatz.getStartFarbe());
+           }
+       }
         ausgewählterBauplatz = bauplätze[id-1];
         System.out.println("Bauplatz"+ausgewählterBauplatz.getNummer());
         if (ausgewähltesGebäude != null){
@@ -178,42 +223,35 @@ public class Spiel {
         switch (gebäude){
             case "Gebäude 1":
                 System.out.println("1");
-                ausgewähltesGebäude = verfügbareGebäudeArten.get(0);
+                //ausgewähltesGebäude = verfügbareGebäudeArten.get(0);
+                ausgewähltesGebäude = new Gebäude("Zelt",10.0,2);
                 break;
             case "Gebäude 2":
                 System.out.println("2");
-                ausgewähltesGebäude = verfügbareGebäudeArten.get(1);
+                ausgewähltesGebäude = new Gebäude("Zelt",15.0,4);
                 break;
             case "Gebäude 3":
                 System.out.println("3");
-                ausgewähltesGebäude = verfügbareGebäudeArten.get(2);
+                ausgewähltesGebäude = new Gebäude("Hütte",25.0,6);
                 break;
             case "Gebäude 4":
                 System.out.println("4");
-                ausgewähltesGebäude = verfügbareGebäudeArten.get(3);
+                ausgewähltesGebäude = new Gebäude("Hütte",30.0,8);
                 break;
             default:
                 System.out.println("None");
         }
-        if (ausgewählterBauplatz != null){
-            System.out.println("Gebäude " + ausgewähltesGebäude.getTyp()+" wird jetzt gebaut");
-            if (ausgewähltesGebäude.getTyp().equalsIgnoreCase("Zelt")){
-                ausgewählterBauplatz.setBackground(Color.yellow);
-            }else {
-                ausgewählterBauplatz.setBackground(Color.BLACK);
-            }
 
+        if (ausgewählterBauplatz != null) {
+            ausgewählterBauplatz.setGebäude(ausgewähltesGebäude);
+            ausgewählterBauplatz.setBackground(ausgewähltesGebäude.getFarbe());
+            aktiverBauplatz = ausgewählterBauplatz.getNummer() - 1;
         }
-        /*
-        if (actionEvent.getActionCommand().equalsIgnoreCase("Gebäude 1")){
-            System.out.println("1");
-        }
-        */
 
     }
 
     private void arbeiterZeigen(String beruf){
-        Arbeitszuweisungsmenü arbeitszuweisung = new Arbeitszuweisungsmenü(beruf,countAdults());
+        Arbeitszuweisungsmenü arbeitszuweisung = new Arbeitszuweisungsmenü(beruf, zähleErwachsene());
         for (int i = 0; i < Menschen.size(); i++){
             if (Menschen.get(i).getAlter()>4){
                 arbeitszuweisung.arbeiter(Menschen.get(i));
@@ -222,7 +260,27 @@ public class Spiel {
         }
     }
 
-    private int countAdults(){
+
+
+    private Mensch[] erwachsene(){
+        int anzahlErwachsene = zähleErwachsene();
+        Mensch[] erwachseneMenschen = new Mensch[anzahlErwachsene];
+        for (int i = 0; i < Menschen.size(); i++){
+            if(Menschen.get(i).getAlter() > 4)erwachseneMenschen[i] = Menschen.get(i);
+        }
+        return erwachseneMenschen;
+    }
+
+    private int zähleKinder(){
+        int kinder = 0;
+        for (int i = 0; i<Menschen.size();i++){
+            if (Menschen.get(i).getAlter() < 5)kinder++;
+        }
+        return kinder;
+    }
+
+
+    private int zähleErwachsene(){
         int erwachsene = 0;
         for (int i = 0; i<Menschen.size();i++){
             if (Menschen.get(i).getAlter() > 4)erwachsene++;
@@ -236,6 +294,7 @@ public class Spiel {
         bildschirm.setNahrung(nahrung);
         bildschirm.setFelle(felle);
         bildschirm.setKleidung(kleidung);
+        bildschirm.setWohnraum(wohnraum);
     }
 
 

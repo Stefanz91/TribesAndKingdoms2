@@ -12,11 +12,20 @@ public class Mensch {
     }
 
     public void setArbeit(String arbeit) {
+        if (wirdAusgebildetVon != null){
+            wirdAusgebildetVon.bildetAus = false;
+            wirdAusgebildetIn = null;
+            wirdAusgebildetVon = null;
+        }
         this.arbeit = arbeit;
     }
 
     private String arbeit;
     private double alter;
+
+    private boolean bildetAus;
+    private Mensch wirdAusgebildetVon;
+    private String wirdAusgebildetIn;
 
     private ArrayList<Fähigkeit>fähigkeiten = new ArrayList<>();
 
@@ -25,8 +34,25 @@ public class Mensch {
         this.name =name;
         this.alter = 0;
         this.arbeit ="";
+        this.bildetAus = false;
+        this.wirdAusgebildetVon = null;
+        this.wirdAusgebildetIn = null;
         addPrimitiveFähigkeiten();
     }
+
+    public void setWirdAusgebildetVon(Mensch meister){
+        if (wirdAusgebildetVon != null){
+            wirdAusgebildetVon.bildetAus = false;
+        }
+        wirdAusgebildetVon = meister;
+        wirdAusgebildetIn = meister.getArbeit();
+        meister.bildetAus = true;
+    }
+
+    public Mensch getWirdAusgebildetVon(){
+        return wirdAusgebildetVon;
+    }
+
 
     public Mensch(String name,double alter, double sammeln, double jagen, double bauen, double handwerken){
         this.name = name;
@@ -81,13 +107,24 @@ public class Mensch {
 
     public int arbeiten(){
         double fähigkeit = fähigkeitAuswählen(arbeit);
-        int erzeugnis = (int)fähigkeit;
-        fähigkeitVerbessern();
+        int erzeugnis;
+        if (bildetAus){
+            erzeugnis = (int)fähigkeit/2;
+        }else {
+            erzeugnis = (int)fähigkeit;
+        }
+        fähigkeitVerbessern(arbeit);
         return erzeugnis;
     }
 
-    private void fähigkeitVerbessern(){
-        switch (arbeit){
+    public void ausbildenLassen(){
+        fähigkeitVerbessern(wirdAusgebildetIn);
+        if (fähigkeitAuswählen(wirdAusgebildetIn) < wirdAusgebildetVon.fähigkeitAuswählen(getArbeit()))
+            fähigkeitVerbessern(wirdAusgebildetIn);
+    }
+
+    private void fähigkeitVerbessern(String fachbezeichnung){
+        switch (fachbezeichnung){
             case "sammeln": fähigkeiten.get(0).fähigkeitVerbessern();
             break;
             case "jagen": fähigkeiten.get(1).fähigkeitVerbessern();

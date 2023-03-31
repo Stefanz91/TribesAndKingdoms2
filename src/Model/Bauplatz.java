@@ -11,6 +11,12 @@ public class Bauplatz extends JButton {
     private boolean bebaut = false;
     private Gebäude gebäude = null;
 
+    private Color startFarbe = new Color(53,104,45);
+
+    public Color getStartFarbe(){
+        return startFarbe;
+    }
+
     public Bauplatz(){
         zähler++;
         this.nummer = zähler;
