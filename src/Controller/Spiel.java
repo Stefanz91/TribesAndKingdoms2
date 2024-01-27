@@ -1,23 +1,20 @@
 package Controller;
 
-import Model.Bauplatz;
-import Model.Gebäude;
-import Model.Mensch;
+import Model.*;
 import View.Arbeitsmenü;
 import View.Arbeitszuweisungsmenü;
 import View.Ausbildungszuweisungsmenü;
 import View.Hauptbildschirm;
-
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
+import java.util.stream.Collectors;
 
 public class Spiel {
 
     private int bevölkerung;
-    private int nahrung;
-    private int felle;
-    private int kleidung;
+    private RessourcenListe ressourcenListe;
     private  int wohnraum;
     private Hauptbildschirm bildschirm;
     private ArrayList<String> namen;
@@ -33,9 +30,7 @@ public class Spiel {
 
     public Spiel() {
         this.bevölkerung = 0;
-        this.nahrung = 0;
-        this.felle = 0;
-        this.kleidung = 0;
+        ressourcenListe = new RessourcenListe();
         this.wohnraum = 0;
         ausgewählterBauplatz = null;
         ausgewähltesGebäude = null;
@@ -73,6 +68,8 @@ public class Spiel {
 
 
 
+
+
     private void gebäudeartenDefinieren(){
         verfügbareGebäudeArten = new ArrayList<>();
         Gebäude zelt = new Gebäude("Zelt",10.0,2);
@@ -102,17 +99,17 @@ public class Spiel {
         for (Mensch mensch: Menschen) {
             int arbeit = mensch.arbeiten();
             if (mensch.getArbeit().equalsIgnoreCase("sammeln")) {
-                nahrung += arbeit;
+                ressourcenListe.increaseRessource("Nahrung",arbeit);
             } else if (mensch.getArbeit().equalsIgnoreCase("jagen")) {
-                nahrung += arbeit / 2;
-                felle += arbeit / 2;
+                ressourcenListe.increaseRessource("Nahrung",arbeit / 2);
+                ressourcenListe.increaseRessource("Felle",arbeit / 2);
             } else if (mensch.getArbeit().equalsIgnoreCase("handwerken")) {
-                if (mensch.getHandwerken() < felle) {
-                    felle -= arbeit;
-                    kleidung += arbeit;
+                if (mensch.getHandwerken() < ressourcenListe.getRessourcenMenge("Felle")) {
+                    ressourcenListe.increaseRessource("Felle",arbeit*(-1));
+                    ressourcenListe.increaseRessource("Kleidung",arbeit);
                 } else {
-                    kleidung += felle;
-                    felle = 0;
+                    ressourcenListe.increaseRessource("Kleidung",(int)ressourcenListe.getRessourcenMenge("Felle"));
+                    ressourcenListe.setRessource("Felle",0);
                 }
             }
             if(mensch.getArbeit().equalsIgnoreCase("bauen")){
@@ -130,8 +127,8 @@ public class Spiel {
         }
 
         int randomNumber;
-        if (nahrung > bevölkerung){
-            nahrung -= bevölkerung;
+        if (ressourcenListe.getRessourcenMenge("Nahrung") > bevölkerung){
+           ressourcenListe.decreaseRessource("Nahrung" ,bevölkerung);
             randomNumber = random.nextInt(0,namen.size());
             Menschen.add(new Mensch(namen.get(randomNumber)));
         }else {
@@ -152,8 +149,7 @@ public class Spiel {
     }
 
     private void altern(){
-        for (Mensch mensch:
-             Menschen) {
+        for (Mensch mensch: Menschen) {
             mensch.altern();
         }
     }
@@ -290,9 +286,9 @@ public class Spiel {
 
     private void zeigeDaten() {
         bildschirm.setBevölkerung(bevölkerung);
-        bildschirm.setNahrung(nahrung);
-        bildschirm.setFelle(felle);
-        bildschirm.setKleidung(kleidung);
+        bildschirm.setNahrung((int)ressourcenListe.getRessourcenMenge("Nahrung"));
+        bildschirm.setFelle((int)ressourcenListe.getRessourcenMenge("Felle"));
+        bildschirm.setKleidung((int)ressourcenListe.getRessourcenMenge("Kleidung"));
         bildschirm.setWohnraum(wohnraum);
     }
 
