@@ -71,11 +71,14 @@ public class Ausbildungszuweisungsmenü extends JFrame {
         comboBoxErwachsene.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                //erwachsene[comboBoxErwachsene.getSelectedIndex()].setBildetaus(true);
                 if (comboBoxErwachsene.getSelectedIndex()>0){
                     kind.setWirdAusgebildetVon(erwachsene[comboBoxErwachsene.getSelectedIndex()-1]);
                     ausbilder = erwachsene[comboBoxErwachsene.getSelectedIndex()-1];
                     ausbildungsberuf.setText(ausbilder.getArbeit());
+                }else{
+                    kind.setWirdAusgebildetVon(null);
+                    ausbilder = null;
+                    ausbildungsberuf.setText("kein Ausbildungsberuf");
                 }
             }
         });

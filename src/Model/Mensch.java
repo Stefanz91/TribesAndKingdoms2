@@ -1,6 +1,7 @@
 package Model;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Random;
 
 public class Mensch {
@@ -135,15 +136,30 @@ public class Mensch {
             break;
             default:
         }
+//        for(Fähigkeit f : fähigkeiten){
+//           if(f.getBezeichnung().equals(fachbezeichnung)){
+//               f.fähigkeitVerbessern();
+//               break;}
+//           }
+
+        fähigkeiten.stream()
+                .filter(f-> f.getBezeichnung().equals(fachbezeichnung))
+                .forEach(Fähigkeit::fähigkeitVerbessern);
     }
 
 
 
     public String besteFähigkeit(){
-        Fähigkeit besteFähigkeit = fähigkeiten.get(0);
-        for (int i = 1; i<fähigkeiten.size();i++){
-            if (fähigkeiten.get(i).getFähigkeitsstärke() >besteFähigkeit.getFähigkeitsstärke() )besteFähigkeit = fähigkeiten.get(i);
-        }
+//        Fähigkeit besteFähigkeit = fähigkeiten.get(0);
+//        for (int i = 1; i<fähigkeiten.size();i++){
+//            if (fähigkeiten.get(i).getFähigkeitsstärke() >besteFähigkeit.getFähigkeitsstärke() )besteFähigkeit = fähigkeiten.get(i);
+//        }
+
+
+        Fähigkeit besteFähigkeit = fähigkeiten.stream()
+                .sorted(Comparator.comparing(Fähigkeit::getFähigkeitsstärke).reversed())
+                .findFirst()
+                .orElse(null);
 
         return besteFähigkeit.getBezeichnung();
     }

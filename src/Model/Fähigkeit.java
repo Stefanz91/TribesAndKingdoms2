@@ -27,4 +27,14 @@ public class Fähigkeit {
         fähigkeitsstärke = Math.round(fähigkeitsstärke);
         fähigkeitsstärke /= 100;
     }
+
+    /*
+    public Fähigkeit innovation(){
+        if (this.fähigkeitsstärke >= 10){
+            Random random = new Random();
+            return fähigkeitenbaum.get(random.nextInt(0,fähigkeitenbaum.size()));
+        }
+    }
+    */
+
 }

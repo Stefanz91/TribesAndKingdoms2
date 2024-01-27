@@ -99,8 +99,7 @@ public class Spiel {
 
 
     private void performNächsteRunde(ActionEvent actionEvent) {
-        for (Mensch mensch:
-                Menschen) {
+        for (Mensch mensch: Menschen) {
             int arbeit = mensch.arbeiten();
             if (mensch.getArbeit().equalsIgnoreCase("sammeln")) {
                 nahrung += arbeit;
@@ -129,6 +128,7 @@ public class Spiel {
             }
             ausbilden();
         }
+
         int randomNumber;
         if (nahrung > bevölkerung){
             nahrung -= bevölkerung;
@@ -146,11 +146,9 @@ public class Spiel {
     }
 
     private void ausbilden(){
-        for (int i = 0; i<Menschen.size(); i++){
-            if (Menschen.get(i).getWirdAusgebildetVon() != null){
-                Menschen.get(i).ausbildenLassen();
-            }
-        }
+        Menschen.stream()
+                .filter(mensch -> mensch.getWirdAusgebildetVon() != null)
+                .forEach(Mensch::ausbildenLassen);
     }
 
     private void altern(){
@@ -251,41 +249,42 @@ public class Spiel {
     }
 
     private void arbeiterZeigen(String beruf){
-        Arbeitszuweisungsmenü arbeitszuweisung = new Arbeitszuweisungsmenü(beruf, zähleErwachsene());
-        for (int i = 0; i < Menschen.size(); i++){
-            if (Menschen.get(i).getAlter()>4){
-                arbeitszuweisung.arbeiter(Menschen.get(i));
-            }
+       Arbeitszuweisungsmenü arbeitszuweisung = new Arbeitszuweisungsmenü(beruf, zähleErwachsene());
 
-        }
+        Menschen.stream()
+                .filter(mensch -> mensch.getAlter() > 4)
+                .forEach(arbeitszuweisung::arbeiter);
+
     }
 
 
 
     private Mensch[] erwachsene(){
-        int anzahlErwachsene = zähleErwachsene();
-        Mensch[] erwachseneMenschen = new Mensch[anzahlErwachsene];
-        for (int i = 0; i < Menschen.size(); i++){
-            if(Menschen.get(i).getAlter() > 4)erwachseneMenschen[i] = Menschen.get(i);
-        }
+
+        Mensch[] erwachseneMenschen = Menschen.stream()
+                .filter(mensch -> mensch.getAlter() > 4)
+                .toArray(Mensch[]::new);
+
         return erwachseneMenschen;
     }
 
     private int zähleKinder(){
-        int kinder = 0;
-        for (int i = 0; i<Menschen.size();i++){
-            if (Menschen.get(i).getAlter() < 5)kinder++;
-        }
-        return kinder;
+
+        long kinder = Menschen.stream()
+                .filter(mensch -> mensch.getAlter() < 5)
+                .count();
+        System.out.println("Kinder: " + kinder);
+        return (int)kinder;
     }
 
 
     private int zähleErwachsene(){
-        int erwachsene = 0;
-        for (int i = 0; i<Menschen.size();i++){
-            if (Menschen.get(i).getAlter() > 4)erwachsene++;
-        }
-        return erwachsene;
+
+        long erwachsene = Menschen.stream()
+                .filter(mensch -> mensch.getAlter()>4)
+                .count();
+
+        return (int)erwachsene;
     }
 
 
